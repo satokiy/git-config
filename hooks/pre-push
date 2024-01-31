@@ -1,2 +1,34 @@
 #!/bin/zsh
-echo "Pre-push hook is running!"
+# 現在のブランチ名を取得
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# リモートブランチが存在するか確認
+if git show-ref --verify --quiet refs/remotes/origin/$current_branch; then
+  # リモートブランチが存在する場合、通常のpushを実行
+  exit 0
+else
+  # リモートブランチが存在しない場合、ユーザーに確認
+  read -p "Remote branch does not exist. Do you want to create and push to it? (y/n) " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # ユーザーがyesを選択した場合、ブランチを作成してpush
+    git push --set-upstream origin $current_branch
+    exit 1
+  fi
+fi
+
+while read local_ref local_sha1 remote_ref remote_sha1
+do
+  if [[ "${remote_ref##refs/heads/}" = "master" ]]; then
+    echo "Warning: push to remote master, continue? [y/N]"
+
+    exec < /dev/tty
+    read ANSWER
+
+    case $ANSWER in
+      "Y" | "y" | "yes" | "Yes" | "YES" ) echo "OK. push start.";;
+      * ) echo "push failed.";exit 1;;
+    esac
+    exit 0
+  fi
+done
