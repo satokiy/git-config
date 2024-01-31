@@ -1,0 +1,17 @@
+[filter "lfs"]
+        clean = git-lfs clean -- %f
+        smudge = git-lfs smudge -- %f
+        process = git-lfs filter-process
+        required = true
+[user]
+        name = Satoki
+        email = 43191933+satokiy@users.noreply.github.com
+[alias]
+        br = branch
+        co = checkout
+        sw = switch
+        st = status
+        ssu = stash save -u
+        f = fetch
+        fp = fetch --prune
+        logo = log --oneline
